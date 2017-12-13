@@ -1,0 +1,24 @@
+#
+# Managed by ansible
+# Role: openvpn
+#
+dev tun
+persist-tun
+persist-key
+auth-nocache
+cipher {{ item.value.cipher | default('AES-128-CBC') }}
+auth {{ item.value.auth | default('SHA256') }}
+resolv-retry infinite
+proto {{ item.value.protocol | default('udp4') }}
+remote {{ item.value.address }} {{ item.value.port | default('1194') }}
+ifconfig {{ item.value.tunnel_local_address }} {{ item.value.tunnel_peer_address }}
+{% if item.value.routes is defined %}
+{% for route in item.value.routes %}
+route {{ route.route }} {{ route.netmask }}
+{% endfor %}
+{% endif %}
+keepalive 10 60
+ping-timer-rem
+<secret>
+{{ item.value.key }}
+</secret>

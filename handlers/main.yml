@@ -1,0 +1,7 @@
+---
+- name: Restart OpenVPN (Output suppressed)
+  systemd:
+      name: "openvpn-client@{{ item.key }}.service"
+      state: restarted
+  with_dict: "{{ openvpn_clients }}"
+  no_log: true

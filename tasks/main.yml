@@ -1,0 +1,30 @@
+---
+
+- block:
+    - name: Install OpenVPN
+      pacman:
+          name: openvpn
+          state: present
+
+    - name: Generating client configs (Output suppressed)
+      template:
+          src: client-config.j2
+          dest: "/etc/openvpn/client/{{ item.key }}.conf"
+          owner: root
+          group: root
+          mode: 0600
+      no_log: true
+      with_dict: "{{ openvpn_clients }}"
+      notify:
+          - Restart OpenVPN
+
+    - name: Enabling systemd services (Output suppressed)
+      systemd:
+          name: "openvpn-client@{{ item.key }}.service"
+          state: started
+          enabled: true
+          masked: false
+      no_log: true
+      with_dict: "{{ openvpn_clients }}"
+
+  when: openvpn_clients is defined
