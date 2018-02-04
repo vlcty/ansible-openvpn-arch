@@ -27,4 +27,14 @@
       no_log: true
       with_dict: "{{ openvpn_clients }}"
 
+    - name: Forward IPv4 and IPv6
+      sysctl:
+          name: "{{ item }}"
+          value: 1
+          sysctl_set: true
+          state: present
+      with_items:
+          - net.ipv4.ip_forward
+          - net.ipv6.conf.all.forwarding
+
   when: openvpn_clients is defined
